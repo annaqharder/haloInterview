@@ -6,21 +6,21 @@ function RoboscoutQueryListIndex() {
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState("");
   const [error, setError] = useState("");
+  const [peopleCounts, setPeopleCounts] = useState({});
 
-  const fetchQueries = async () => {
-    const response = await fetch(`http://localhost:3000/roboscout_queries`, {
+  const fetchQueries = () => {
+    return fetch(`http://localhost:3000/roboscout_queries`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
       },
-    });
-
-    if (!response.ok) {
-      throw new Error("Network response was not ok");
-    }
-
-    const data = await response.json();
-    return data;
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      });
   };
 
   const { data: queries, status, refetch } = useQuery(
@@ -32,26 +32,26 @@ function RoboscoutQueryListIndex() {
     }
   );
 
-  const createQuery = async (newQuery) => {
-    const response = await fetch(`http://localhost:3000/roboscout_queries`, {
+  const createQuery = (newQuery) => {
+    return fetch(`http://localhost:3000/roboscout_queries`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ query: newQuery }),
-    });
-
-    if (!response.ok) {
-      throw new Error("Network response was not ok");
-    }
-
-    const data = await response.json();
-    return data;
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      });
   };
 
   const mutation = useMutation(createQuery, {
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries("roboscoutQueries");
+      setPeopleCounts((prev) => ({ ...prev, [data.id]: 0 }));
     },
     onError: (error) => {
       setError(error.message);
@@ -76,6 +76,21 @@ function RoboscoutQueryListIndex() {
 
     return () => clearInterval(interval); // Cleanup interval on component unmount
   }, [refetch]);
+
+  useEffect(() => {
+    if (status === "success" && queries) {
+      console.log("Fetched queries:", queries); // Log the entire queries object
+      const newCounts = {};
+      queries.forEach((query) => {
+        console.log(`Query ID: ${query.id}, People:`, query.people); // Log each query's people
+        const peopleCount = query.people ? query.people.length : 0;
+        newCounts[query.id] = peopleCount;
+        console.log(`Query ID: ${query.id}, People Count: ${peopleCount}`);
+      });
+      setPeopleCounts(newCounts);
+      console.log("Updated peopleCounts: ", newCounts); // Log the updated peopleCounts
+    }
+  }, [status, queries]);
 
   return (
     <div>
@@ -136,7 +151,7 @@ function RoboscoutQueryListIndex() {
                     <th style={{ border: "1px solid #ddd", padding: "8px" }}>ID</th>
                     <th style={{ border: "1px solid #ddd", padding: "8px" }}>Query</th>
                     <th style={{ border: "1px solid #ddd", padding: "8px" }}>Progress</th>
-                    <th style={{ border: "1px solid #ddd", padding: "8px" }}>Results</th>
+                    <th style={{ border: "1px solid #ddd", padding: "8px" }}>People Count</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -155,7 +170,7 @@ function RoboscoutQueryListIndex() {
                         {query.status}
                       </td>
                       <td style={{ border: "1px solid #ddd", padding: "8px" }}>
-                        {query.results}
+                        {peopleCounts[query.id] || 0}
                       </td>
                     </tr>
                   ))}

@@ -3,13 +3,13 @@ class RoboscoutQueriesController < ApplicationController
 
   # GET /roboscout_queries
   def index
-    @roboscout_queries = RoboscoutQuery.all
-    render json: @roboscout_queries
+    @roboscout_queries = RoboscoutQuery.includes(:people).all
+    render json: @roboscout_queries.to_json(include: :people)
   end
 
   # GET /roboscout_queries/1
   def show
-    render json: @roboscout_query
+    render json: @roboscout_query.to_json(include: :people)
   end
 
   # POST /roboscout_queries
