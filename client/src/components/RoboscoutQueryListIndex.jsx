@@ -151,7 +151,7 @@ function RoboscoutQueryListIndex() {
                     <th style={{ border: "1px solid #ddd", padding: "8px" }}>ID</th>
                     <th style={{ border: "1px solid #ddd", padding: "8px" }}>Query</th>
                     <th style={{ border: "1px solid #ddd", padding: "8px" }}>Progress</th>
-                    <th style={{ border: "1px solid #ddd", padding: "8px" }}>People Count</th>
+                    <th style={{ border: "1px solid #ddd", padding: "8px" }}>Results</th>
                   </tr>
                 </thead>
                 <tbody>
