@@ -92,6 +92,17 @@ function RoboscoutQueryListIndex() {
     }
   }, [status, queries]);
 
+  const getStatusText = (status) => {
+    switch (status) {
+      case "in_progress":
+        return "In Progress";
+      case "finished":
+        return "Finished";
+      default:
+        return status;
+    }
+  };
+
   return (
     <div>
       <div
@@ -151,7 +162,7 @@ function RoboscoutQueryListIndex() {
                     <th style={{ border: "1px solid #ddd", padding: "8px" }}>ID</th>
                     <th style={{ border: "1px solid #ddd", padding: "8px" }}>Query</th>
                     <th style={{ border: "1px solid #ddd", padding: "8px" }}>Progress</th>
-                    <th style={{ border: "1px solid #ddd", padding: "8px" }}>Results</th>
+                    <th style={{ border: "1px solid #ddd", padding: "8px" }}>People Count</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -167,7 +178,7 @@ function RoboscoutQueryListIndex() {
                         </Link>
                       </td>
                       <td style={{ border: "1px solid #ddd", padding: "8px" }}>
-                        {query.status}
+                        {getStatusText(query.status)}
                       </td>
                       <td style={{ border: "1px solid #ddd", padding: "8px" }}>
                         {peopleCounts[query.id] || 0}
